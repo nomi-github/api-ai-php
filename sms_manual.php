@@ -1,12 +1,11 @@
 <?
-	include("xmlrpc.inc.php");
 	
 	header('Content-Type: application/json');
 	ob_start();
 	
 	$json = file_get_contents('php://input'); 
 	$request = json_decode($json, true);
-	
+		
 	$action = $request["result"]["action"];
 	
 	// get parameters from request
@@ -45,43 +44,12 @@
 	
 	
 	function getResult($bank, $date, $datePeriod, $currencyType) {
-		$vArrData=array();
-		$vArrData[]=new xmlrpcval(array(new xmlrpcval("TDB"), 
-										new xmlrpcval(md5("SERVICE")), 
-										new xmlrpcval($bank), 
-										new xmlrpcval($dateFrom),
-										new xmlrpcval($dateTo),
-										new xmlrpcval($currencyType)
-										),"struct");
-
-		$f=new xmlrpcmsg("rateHist", array(new xmlrpcval($vArrData,"array")));
+		return array(
+		"source": "apiai-nomi-test-currency-converter-webhook-sample"
+		"speech" => $speech,
+		"displayText" => $speech,
+		"contextOut" => array()
+			);
 		
-		$c=new xmlrpc_client("/server.php", "172.25.0.8", 80);
-		$c->setDebug(0);
-		$r=$c->send($f);
-		$v=$r->value();
-		$speech = '';
-		if(!$r->faultCode()) 
-		{
-			$str=htmlspecialchars($v->scalarval());
-			$str=explode("\n",$str);
-			
-			foreach($str as $k=>$v)
-			{
-				$tmp=explode(";",$v);
-				print_r(json_encode($tmp));
-				$speech += json_encode($tmp);
-			}
-			return array(
-				"source": "apiai-nomi-test-currency-converter-webhook-sample"
-				"speech" => $speech,
-				"displayText" => $speech,
-				"contextOut" => array()
-				);
-		}
-		else {
-			//echo htmlspecialchars($r->faultString());
-			return "no result found"; 
-		}
 	}
 ?>
